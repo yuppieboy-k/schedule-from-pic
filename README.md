@@ -104,7 +104,7 @@ others if your first choice rate-limits or errors.
 
 | Provider | Free tier | Sign up | Get key |
 |---|---|---|---|
-| **Google Gemini 2.0 Flash** (recommended) | 15 RPM, 1,500 req/day | [aistudio.google.com](https://aistudio.google.com/) | [API key page](https://aistudio.google.com/apikey) |
+| **Google Gemini 3.6 Flash** (recommended) | 15 RPM, 1,500 req/day | [aistudio.google.com](https://aistudio.google.com/) | [API key page](https://aistudio.google.com/apikey) |
 | **Groq Llama 3.2 Vision** (fastest) | 30 RPM, ~14,400 req/day | [console.groq.com](https://console.groq.com/) | [Keys page](https://console.groq.com/keys) |
 | **HuggingFace Qwen2-VL** (open source) | Rate-limited but free | [huggingface.co](https://huggingface.co/) | [Token settings](https://huggingface.co/settings/tokens) |
 
@@ -159,8 +159,8 @@ service worker. All of these provide HTTPS for free.
 When you change any of the local files, the service worker will keep
 serving the old cached version. To force an update:
 
-1. Bump the cache version in `sw.js` — change `CACHE_VERSION = 'schedule-v1'`
-   to `schedule-v2` (or higher).
+1. Bump the cache version in `sw.js` — change `CACHE_VERSION = 'schedule-v2'`
+   to `schedule-v3` (or higher).
 2. Re-deploy.
 3. On the phone, close and reopen the app (or pull-to-refresh in
    Chrome's install dialog). The new SW replaces the old one and

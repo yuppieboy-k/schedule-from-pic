@@ -44,19 +44,21 @@ export function splitDataUrl(dataUrl) {
   return { mime: m[1], b64: m[2] };
 }
 
-/* ---------- Google Gemini 2.0 Flash ----------
+/* ---------- Google Gemini 3.6 Flash ----------
    Docs: https://ai.google.dev/gemini-api/docs/vision
    Free tier: 15 RPM, 1,500 req/day.
+   NOTE: gemini-2.0-flash was shut down by Google; we now use
+   gemini-3.6-flash. The request/response shape is identical.
 */
 export const gemini = {
-  name: "Gemini 2.0 Flash",
+  name: "Gemini 3.6 Flash",
   needs: { apiKey: true, envVar: null },
   async extract(dataUrl, { apiKey, onStatus }) {
     if (!apiKey) throw new Error("Missing Gemini API key");
     onStatus?.("Uploading to Gemini…");
     const { b64 } = splitDataUrl(dataUrl);
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
     const body = {
       contents: [{
         parts: [
