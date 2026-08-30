@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1d3a"/>
+      <stop offset="100%" stop-color="#0f1226"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="40" fill="url(#bg)"/>
+  <!-- Calendar body -->
+  <rect x="36" y="48" width="120" height="110" rx="14" fill="#ffffff"/>
+  <rect x="36" y="48" width="120" height="28" rx="14" fill="url(#accent)"/>
+  <rect x="36" y="62" width="120" height="14" fill="url(#accent)"/>
+  <!-- Top hooks -->
+  <rect x="58" y="34" width="10" height="26" rx="4" fill="#cbd5e1"/>
+  <rect x="124" y="34" width="10" height="26" rx="4" fill="#cbd5e1"/>
+  <!-- Photo corner -->
+  <path d="M140 96 L156 112 L140 128 Z" fill="url(#accent)" opacity="0.9"/>
+  <!-- Camera lens hint -->
+  <circle cx="78" cy="124" r="14" fill="none" stroke="url(#accent)" stroke-width="5"/>
+  <circle cx="78" cy="124" r="6" fill="url(#accent)"/>
+</svg>
