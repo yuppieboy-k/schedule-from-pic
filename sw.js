@@ -6,7 +6,7 @@
    when the user is offline.
    ========================================================= */
 
-const CACHE_VERSION = 'schedule-v1';
+const CACHE_VERSION = 'schedule-v2';
 const ASSETS = [
   './',
   './index.html',
