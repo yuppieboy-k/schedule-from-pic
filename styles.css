@@ -165,6 +165,7 @@ a:hover { text-decoration: underline; }
   letter-spacing: -0.02em;
   margin: 0;
   flex: 1;
+  padding-right: 52px;  /* leave room for the absolutely-positioned gear */
 }
 .app-subtitle {
   margin: 0;

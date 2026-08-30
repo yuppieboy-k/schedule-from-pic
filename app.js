@@ -12,6 +12,7 @@ import { generateICS, downloadICS, googleCalendarURL } from "./export.js";
 const state = {
   imageFile: null,        // File
   imageDataUrl: null,     // downscaled base64
+  previewUrl: null,       // object URL for the preview <img> (tracked so we can revoke it)
   event: null,            // { title, startDateTime, endDateTime, location, description, rawText, confidence }
   abortController: null,  // for cancelling in-flight extract
   providerUsed: null,
@@ -99,10 +100,17 @@ async function handleFileChosen(file) {
     return;
   }
   state.imageFile = file;
-  const previewUrl = URL.createObjectURL(file);
+
+  // Revoke the PREVIOUS object URL (if any) before creating a new one,
+  // so we don't leak memory across multiple picks. Do NOT revoke the
+  // current one inside an onload handler — the browser may need to
+  // re-fetch the blob on repaint, and revoking early leaves the
+  // preview image blank. The URL is revoked later by startOver().
+  if (state.previewUrl) URL.revokeObjectURL(state.previewUrl);
+
+  state.previewUrl = URL.createObjectURL(file);
   const img = document.getElementById("preview-image");
-  img.src = previewUrl;
-  img.onload = () => URL.revokeObjectURL(previewUrl);
+  img.src = state.previewUrl;
   show("preview");
 }
 
@@ -306,6 +314,10 @@ function startOver() {
   state.imageDataUrl = null;
   state.event = null;
   state.providerUsed = null;
+  if (state.previewUrl) {
+    URL.revokeObjectURL(state.previewUrl);
+    state.previewUrl = null;
+  }
   document.getElementById("preview-image").src = "";
   show("home");
 }
