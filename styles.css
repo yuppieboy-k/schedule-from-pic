@@ -160,12 +160,12 @@ a:hover { text-decoration: underline; }
   position: relative;
 }
 .app-title {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.02em;
   margin: 0;
   flex: 1;
-  padding-right: 52px;  /* leave room for the absolutely-positioned gear */
+  width: 100%;
 }
 .app-subtitle {
   margin: 0;
@@ -180,7 +180,6 @@ a:hover { text-decoration: underline; }
   text-align: center;
 }
 .header-spacer { width: 36px; }
-.settings-btn { position: absolute; top: env(safe-area-inset-top); right: 0; }
 
 .icon-btn {
   width: 36px; height: 36px;
@@ -242,6 +241,29 @@ a:hover { text-decoration: underline; }
   display: flex;
   justify-content: center;
 }
+.home-settings {
+  display: flex;
+  justify-content: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+.settings-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 0;
+  color: var(--text-dim);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.18s var(--ease-out), color 0.18s var(--ease-out);
+}
+.settings-link:hover { background: var(--surface-2); color: var(--text); }
+.settings-link:active { transform: scale(0.97); }
 .badge {
   font-size: 12px;
   color: var(--text-dim);

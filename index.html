@@ -18,12 +18,7 @@
     <section class="screen screen-home is-active" data-screen="home" aria-label="Home">
       <header class="screen-header">
         <h1 class="app-title">Schedule from Pic</h1>
-        <p class="app-subtitle">Point, shoot, schedule. From any flyer to your calendar.</p>
-        <button class="icon-btn settings-btn" type="button" data-action="open-settings" aria-label="Settings">
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-            <path fill="currentColor" d="M19.14 12.94a7.49 7.49 0 0 0 .05-.94 7.49 7.49 0 0 0-.05-.94l2.03-1.58a.48.48 0 0 0 .12-.61l-1.92-3.32a.48.48 0 0 0-.58-.21l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.4h-3.84a.48.48 0 0 0-.48.4l-.36 2.54c-.59.24-1.13.55-1.62.94l-2.39-.96a.48.48 0 0 0-.58.21L2.73 8.87a.48.48 0 0 0 .12.61l2.03 1.58a7.49 7.49 0 0 0-.05.94 7.49 7.49 0 0 0 .05.94L2.85 14.52a.48.48 0 0 0-.12.61l1.92 3.32c.13.23.41.32.65.21l2.39-.96c.49.39 1.03.7 1.62.94l.36 2.54c.04.24.24.4.48.4h3.84c.24 0 .44-.16.48-.4l.36-2.54c.59-.24 1.13-.55 1.62-.94l2.39.96c.24.11.52.02.65-.21l1.92-3.32a.48.48 0 0 0-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/>
-          </svg>
-        </button>
+        <p class="app-subtitle">Point, shoot, schedule. From any picture to your calendar.</p>
       </header>
 
       <div class="home-actions">
@@ -50,6 +45,15 @@
 
       <input id="file-camera" type="file" accept="image/*" capture="environment" hidden />
       <input id="file-library" type="file" accept="image/*" hidden />
+
+      <div class="home-settings">
+        <button class="settings-link" type="button" data-action="open-settings" aria-label="Open settings">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path fill="currentColor" d="M19.14 12.94a7.49 7.49 0 0 0 .05-.94 7.49 7.49 0 0 0-.05-.94l2.03-1.58a.48.48 0 0 0 .12-.61l-1.92-3.32a.48.48 0 0 0-.58-.21l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.4h-3.84a.48.48 0 0 0-.48.4l-.36 2.54c-.59.24-1.13.55-1.62.94l-2.39-.96a.48.48 0 0 0-.58.21L2.73 8.87a.48.48 0 0 0 .12.61l2.03 1.58a7.49 7.49 0 0 0-.05.94 7.49 7.49 0 0 0 .05.94L2.85 14.52a.48.48 0 0 0-.12.61l1.92 3.32c.13.23.41.32.65.21l2.39-.96c.49.39 1.03.7 1.62.94l.36 2.54c.04.24.24.4.48.4h3.84c.24 0 .44-.16.48-.4l.36-2.54c.59-.24 1.13-.55 1.62-.94l2.39.96c.24.11.52.02.65-.21l1.92-3.32a.48.48 0 0 0-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/>
+          </svg>
+          <span>Settings</span>
+        </button>
+      </div>
 
       <footer class="home-footer">
         <span class="badge">🔒 Image leaves device only when you tap Extract</span>
