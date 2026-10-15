@@ -1,17 +1,15 @@
 /* =========================================================
    Schedule from Pic — Service Worker
-   Cache-first strategy so the app shell works offline.
-   Bump CACHE_VERSION when shipping new assets.
-   Tesseract.js is NOT pre-cached; it loads on demand only
-   when the user is offline.
+   Cache-first strategy for app shell assets.
    ========================================================= */
 
-const CACHE_VERSION = 'schedule-v5';
+const CACHE_VERSION = 'schedule-v7';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './app.js',
+  './gemini.js',
   './providers.js',
   './prompt.js',
   './export.js',
@@ -42,16 +40,17 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
-  // Never cache API calls to LLM providers.
+  // Never cache API calls to Google Gemini or external services
   const url = new URL(request.url);
   if (
     url.host.endsWith('googleapis.com') ||
+    url.host.endsWith('google.com') ||
     url.host.endsWith('groq.com') ||
     url.host.endsWith('huggingface.co') ||
-    url.host.endsWith('cdn.jsdelivr.net') ||  // Tesseract.js worker
+    url.host.endsWith('cdn.jsdelivr.net') ||
     url.host.endsWith('unpkg.com')
   ) {
-    return;  // let the network handle it
+    return; // let network handle it
   }
 
   if (request.method !== 'GET') return;

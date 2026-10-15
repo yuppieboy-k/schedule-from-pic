@@ -1,12 +1,12 @@
 /* =========================================================
    Schedule from Pic — Extraction Prompt & JSON Schema
-   Shared by all vision-LLM providers (Gemini, Groq, HF).
+   Used by Gemini Vision and vision models.
    ========================================================= */
 
 /**
  * JSON Schema that the LLM is asked to return.
  * Every field is optional except `title` and `startDateTime` —
- * the validator (in app.js) drops anything that fails.
+ * the validator drops anything that fails.
  */
 export const EVENT_SCHEMA = {
   type: "object",
@@ -33,8 +33,7 @@ export const EVENT_SCHEMA = {
 };
 
 /**
- * System prompt sent to every provider. Kept provider-agnostic —
- * the JSON contract is the only thing providers must honor.
+ * System prompt sent to Gemini.
  */
 export const SYSTEM_PROMPT = `You are a precise calendar-event extractor. You read images of flyers, posters, screenshots, invitations, and event announcements, and you return a single JSON object describing the event.
 
@@ -53,14 +52,38 @@ Output JSON matching this schema:
 ${JSON.stringify(EVENT_SCHEMA, null, 2)}`;
 
 /**
+ * Generate an enhanced prompt with real-time temporal context (user's current date, day of week, and timezone).
+ */
+export function getPromptWithContext(now = new Date()) {
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const dateFormatted = now.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const timeFormatted = now.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZoneName: "short",
+  });
+
+  return `${SYSTEM_PROMPT}
+
+USER TEMPORAL CONTEXT:
+- Current date & time: ${dateFormatted}, ${timeFormatted}
+- Current ISO reference: ${now.toISOString()}
+- User timezone: ${timeZone}
+
+CRITICAL EXTRACTION GUIDANCE:
+- If the event date omits the year (e.g. "Saturday Nov 14th" or "July 4"), calculate the correct future year relative to the current date (${dateFormatted}).
+- If relative dates are used (e.g. "This Friday", "Tomorrow at 8pm"), calculate the exact ISO 8601 timestamp based on ${dateFormatted}.
+- If startDateTime is found but end time is not mentioned, either leave endDateTime null or estimate based on typical event duration.`;
+}
+
+/**
  * Validate and normalize a parsed LLM response. Returns either
  * a clean event object or throws with a descriptive message.
- *
- * Normalizations:
- *  - Strips markdown fences if the model still emitted them
- *  - Ensures title and startDateTime are present and non-empty
- *  - Normalizes confidence levels to "high" | "medium" | "low"
- *  - Falls back to a 1-hour endDateTime if start exists but end doesn't
  */
 export function validateAndNormalize(raw) {
   if (raw == null) throw new Error("Empty response from provider");
@@ -69,8 +92,18 @@ export function validateAndNormalize(raw) {
   let obj = raw;
   if (typeof raw === "string") {
     const text = stripFences(raw).trim();
-    try { obj = JSON.parse(text); }
-    catch (e) { throw new Error("Provider returned non-JSON: " + text.slice(0, 200)); }
+    try {
+      obj = JSON.parse(text);
+    } catch {
+      // Try to find a JSON object in the string if model added commentary
+      const match = text.match(/\{[\s\S]*\}/);
+      if (match) {
+        try { obj = JSON.parse(match[0]); }
+        catch (e) { throw new Error("Provider returned non-JSON: " + text.slice(0, 200)); }
+      } else {
+        throw new Error("Provider returned non-JSON: " + text.slice(0, 200));
+      }
+    }
   }
   if (typeof obj !== "object" || Array.isArray(obj)) {
     throw new Error("Provider returned non-object JSON");

@@ -1,4 +1,4 @@
-# Schedule from Pic
+# Schedule from Pic 
 
 A small, single-page **PWA that turns a photo of a flyer, poster, or
 screenshot into a calendar event**. Snap a picture, the app extracts the

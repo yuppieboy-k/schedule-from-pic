@@ -1,8 +1,10 @@
 /* =========================================================
    Schedule from Pic — Calendar Export
-   - generateICS()         : RFC 5545 .ics string
-   - downloadICS()         : triggers a file download
-   - googleCalendarURL()   : Google Calendar event-template URL
+   - generateICS()              : RFC 5545 .ics string
+   - downloadICS()              : triggers a file download
+   - googleCalendarURL()        : Google Calendar event URL (pre-filled, manual save)
+   - outlookCalendarURL()       : Outlook Web event URL (pre-filled, manual save)
+   - openInDefaultCalendar()    : Uses Web Share API or .ics to launch default calendar app for review & manual save
    ========================================================= */
 
 /**
@@ -91,10 +93,21 @@ export function generateICS(event, opts = {}) {
     "BEGIN:VEVENT",
     `UID:${uid}`,
     `DTSTAMP:${now}`,
-    `DTSTART:${toICalUTC(start)}`,
-    `DTEND:${toICalUTC(end)}`,
-    `SUMMARY:${escapeText(event.title)}`,
   ];
+
+  if (event.allDay) {
+    const pad = (n) => String(n).padStart(2, "0");
+    const ymdStart = `${start.getFullYear()}${pad(start.getMonth() + 1)}${pad(start.getDate())}`;
+    const endPlus = new Date(end.getTime() + 24 * 60 * 60 * 1000);
+    const ymdEnd = `${endPlus.getFullYear()}${pad(endPlus.getMonth() + 1)}${pad(endPlus.getDate())}`;
+    lines.push(`DTSTART;VALUE=DATE:${ymdStart}`);
+    lines.push(`DTEND;VALUE=DATE:${ymdEnd}`);
+  } else {
+    lines.push(`DTSTART:${toICalUTC(start)}`);
+    lines.push(`DTEND:${toICalUTC(end)}`);
+  }
+
+  lines.push(`SUMMARY:${escapeText(event.title)}`);
   if (event.location)    lines.push(`LOCATION:${escapeText(event.location)}`);
   if (event.description) lines.push(`DESCRIPTION:${escapeText(event.description)}`);
   lines.push(`URL:${url}`);
@@ -122,8 +135,8 @@ export function downloadICS(event) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function makeFilename(event) {
-  const date = new Date(event.startDateTime);
+export function makeFilename(event) {
+  const date = new Date(event.startDateTime || Date.now());
   const ymd = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}`;
   const slug = String(event.title || "event")
     .toLowerCase()
@@ -134,9 +147,46 @@ function makeFilename(event) {
 }
 
 /**
+ * Open event in the default system calendar application.
+ * Uses Web Share API with a .ics file on iOS / Android to trigger
+ * the native calendar event preview sheet (where the user manually reviews and saves).
+ * On desktop or unsupported platforms, downloads the .ics file which launches
+ * the system calendar (Calendar.app on macOS, Outlook/Calendar on Windows)
+ * in preview mode.
+ */
+export async function openInDefaultCalendar(event) {
+  const icsBody = generateICS(event);
+  const filename = `${makeFilename(event)}.ics`;
+  const blob = new Blob([icsBody], { type: "text/calendar;charset=utf-8" });
+
+  if (typeof navigator !== "undefined" && typeof navigator.share === "function" && typeof File !== "undefined") {
+    try {
+      const file = new File([blob], filename, { type: "text/calendar" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: event.title,
+          text: `Event: ${event.title}`,
+          files: [file],
+        });
+        return { method: "share", success: true };
+      }
+    } catch (err) {
+      if (err.name === "AbortError") {
+        return { method: "share", success: false, aborted: true };
+      }
+      console.warn("navigator.share failed, falling back to .ics download:", err);
+    }
+  }
+
+  // Fallback to downloading .ics
+  downloadICS(event);
+  return { method: "download", success: true };
+}
+
+/**
  * Build a Google Calendar "create event" URL.
- * Google expects basic ISO strings (no colons/dashes in the date part).
- * All-day events use the YYYYMMDD format for both start and end.
+ * Google opens the event review page (action=TEMPLATE) with fields pre-filled,
+ * allowing the user to review and manually click "Save".
  */
 export function googleCalendarURL(event) {
   if (!event || !event.title) throw new Error("Event must have a title");
@@ -152,7 +202,6 @@ export function googleCalendarURL(event) {
     String(d.getUTCMinutes()).padStart(2, "0") +
     "00Z";
 
-  // For all-day events, Google expects date-only (YYYYMMDD) and the end is exclusive (+1 day).
   let dates;
   if (event.allDay) {
     const ymd = (d) =>
@@ -173,4 +222,26 @@ export function googleCalendarURL(event) {
     location: event.location || "",
   });
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+/**
+ * Build an Outlook Live "create event" deeplink URL.
+ * Opens Outlook in compose mode so the user can review and manually save.
+ */
+export function outlookCalendarURL(event) {
+  if (!event || !event.title) throw new Error("Event must have a title");
+  const start = new Date(event.startDateTime);
+  const end   = new Date(event.endDateTime || new Date(start.getTime() + 60 * 60 * 1000));
+
+  const params = new URLSearchParams({
+    path: "/calendar/action/compose",
+    rru: "addevent",
+    subject: event.title,
+    startdt: start.toISOString(),
+    enddt: end.toISOString(),
+    location: event.location || "",
+    body: event.description || "",
+    allday: event.allDay ? "true" : "false",
+  });
+  return `https://outlook.live.com/calendar/0/deeplink/compose?${params.toString()}`;
 }
