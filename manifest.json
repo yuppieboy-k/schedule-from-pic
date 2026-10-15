@@ -1,0 +1,19 @@
+{
+  "name": "Schedule from Pic",
+  "short_name": "Schedule",
+  "description": "Extract calendar events from any photo of a flyer, poster, or screenshot.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1226",
+  "theme_color": "#0f1226",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
